@@ -7,3 +7,4 @@ pydantic[email]
 passlib
 python-jose
 python-multipart
+httpx

@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: Optional[EmailStr] = None
     name: str
     login: str
     phone: Optional[str] = None
@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     user_id: int
-    email: EmailStr
+    email: Optional[EmailStr] = None
     name: str
     login: str
     phone: Optional[str] = None

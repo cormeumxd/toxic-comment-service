@@ -12,10 +12,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 async def register_user(user_create: UserCreate, db: AsyncSession):
     # Check if login or email already exists
-    result = await db.execute(select(User).where((User.login == user_create.login) | (User.email == user_create.email)))
+    result = await db.execute(select(User).where((User.login == user_create.login)))
     existing_user = result.scalars().first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Login or email already registered")
+        raise HTTPException(status_code=400, detail="Login already registered")
 
     new_user = User(
         email=user_create.email,
