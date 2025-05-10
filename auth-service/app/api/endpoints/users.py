@@ -17,6 +17,20 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserResponse)
 async def register(user_create: UserCreate, db: AsyncSession = Depends(get_db)):
+    """
+    Register a new user.
+
+    Create a new user and its wallet.
+
+    Args:
+        user_create (UserCreate): User registration data.
+
+    Returns:
+        UserResponse: Created user.
+
+    Raises:
+        HTTPException: If user with given login already exists.
+    """
     user = await register_user(user_create, db)
     try:
         access_token = create_access_token(
@@ -35,6 +49,20 @@ async def register(user_create: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    """
+    Login user.
+
+    Authenticate a user and issue an access token.
+
+    Args:
+        form_data (OAuth2PasswordRequestForm): User authentication data.
+
+    Returns:
+        Token: Access token.
+
+    Raises:
+        HTTPException: If user with given login and password does not exist.
+    """
     user = await authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=400, detail="Неправильный логин или пароль")
