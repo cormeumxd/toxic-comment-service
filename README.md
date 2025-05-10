@@ -51,3 +51,13 @@ curl -X POST http://localhost:8000/analyze \
   -H "Authorization: Bear
 
 ```
+Также надо создать .env файл в корневой папке проекта с переменными окружения для доступа к базе данных и секретным ключом JWT:
+
+```bash
+DB_HOST=postgres
+DB_PORT=5433
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=postgres
+SECRET_KEY=your-secret-key
+```
