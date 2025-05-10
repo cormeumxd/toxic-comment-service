@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.database import get_db
 from db.models import Wallet
-from schemas import WalletCreate, WalletResponse
+from schemas import WalletCreate, WalletResponse, TopUpRequest
 from utils import get_wallet, create_wallet, update_balance
 from auth import get_current_user
 import logging
@@ -36,11 +36,12 @@ async def read_wallet(
 @router.post("/{user_id}/topup", response_model=WalletResponse)
 async def topup_wallet(
     user_id: int, 
-    amount: float,
+    request: TopUpRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    if user_id != current_user["user_id"]:
+    amount = request.amount
+    if user_id != int(current_user["sub"]):
         raise HTTPException(status_code=401, detail="Unauthorized")
     wallet = await update_balance(db, user_id, amount)
     logger.info("Wallet topped up")
