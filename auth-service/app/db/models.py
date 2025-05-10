@@ -10,7 +10,6 @@ class User(Base):
     name = Column(String)
     login = Column(String, unique=True)
     phone = Column(String)
-    #is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     modified_at = Column(DateTime, onupdate=datetime.datetime.utcnow)
 

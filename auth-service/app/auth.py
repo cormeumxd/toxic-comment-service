@@ -11,11 +11,10 @@ from datetime import datetime, timedelta
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 async def register_user(user_create: UserCreate, db: AsyncSession):
-    # Check if login or email already exists
     result = await db.execute(select(User).where((User.login == user_create.login)))
     existing_user = result.scalars().first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Login already registered")
+        raise HTTPException(status_code=400, detail="Пользователь с таким логином уже существует")
 
     new_user = User(
         email=user_create.email,
@@ -26,7 +25,7 @@ async def register_user(user_create: UserCreate, db: AsyncSession):
         modified_at=datetime.utcnow()
     )
     db.add(new_user)
-    await db.flush()  # To get new_user.user_id
+    await db.flush()
 
     password_hash = get_password_hash(user_create.password)
     new_cred = Credential(
