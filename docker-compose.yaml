@@ -1,0 +1,78 @@
+version: '3'
+services:
+  db:
+    image: postgres:15
+    env_file:
+      - .env
+    command: >
+      bash -c "apt-get update &&
+               docker-entrypoint.sh postgres"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:${POSTGRES_PORT}"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  wallet-service:
+    build:
+      context: .
+      dockerfile: ./wallet-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8002:8002"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8003:8003"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ml-service:
+    build:
+      context: .
+      dockerfile: ./ml-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8001:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  transaction-service:
+      build:
+        context: .
+        dockerfile: ./transaction-service/Dockerfile
+      env_file:
+        - .env
+      ports:
+        - "8000:8000"
+      depends_on:
+        db:
+          condition: service_healthy
+  streamlit:
+    build:
+      context: .
+      dockerfile: ./streamlit/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+volumes:
+  db_data:
