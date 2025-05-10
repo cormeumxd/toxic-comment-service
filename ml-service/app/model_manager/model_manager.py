@@ -18,6 +18,19 @@ class ModelManager(ModelManagerABC):
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
     async def get_available_models(self, db) -> List[MLModel]:
+        """
+        Retrieves a list of available machine learning models from the database.
+
+        Args:
+            db (AsyncSession): The asynchronous database session.
+
+        Returns:
+            List[MLModel]: A list of MLModel instances representing the available models.
+
+        Raises:
+            Exception: If there is an error while fetching models from the database.
+        """
+
         try:
             result = await db.execute(select(MLModel))
             models = result.scalars().all()
@@ -27,6 +40,15 @@ class ModelManager(ModelManagerABC):
             raise
 
     async def download_models(self, db: AsyncSession):
+        """
+        Downloads and loads all available models from the database into memory.
+
+        Args:
+            db (AsyncSession): The asynchronous database session.
+
+        Raises:
+            Exception: If there is an error while fetching models from the database or loading models into memory.
+        """
         try:
             stmt = select(MLModel.id, MLModel.name, MLModel.type)
             result = await db.execute(stmt)
@@ -48,6 +70,19 @@ class ModelManager(ModelManagerABC):
             raise
 
     async def predict(self, model_id: int, data: List[str]):
+        """
+        Makes a prediction using the specified model and input data.
+
+        Args:
+            model_id (int): The ID of the model to use for prediction.
+            data (List[str]): The input data to predict.
+
+        Returns:
+            The prediction result.
+
+        Raises:
+            Exception: If the model is not available or there is an error while making the prediction.
+        """
         try:
             model = self._model_pool[model_id]
             return model(data)
